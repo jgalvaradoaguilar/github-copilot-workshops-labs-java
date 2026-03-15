@@ -30,7 +30,7 @@ This repository contains a collection of challenges to improve your skills with 
 
 ### 2.- Copilot Chat
 
-    Open Copilot Chat (Ctrl+Shift+' in VS Code).
+    Open Copilot Chat (Ctrl+Shift+I in VS Code).
 
     Ask questions like:
     “How can I inject a service into this controller?”
