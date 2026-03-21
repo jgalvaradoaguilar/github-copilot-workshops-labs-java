@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4c5aa0 0%, #3d4a85 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .content {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .btn-add {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-add:hover {
+            background-color: #45a049;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table thead {
+            background-color: #f8f9fa;
+        }
+
+        table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ee;
+        }
+
+        table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            color: #666;
+        }
+
+        table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background-color: #0b7dda;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .btn-edit:hover {
+            background-color: #ffb300;
+        }
+
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #da190b;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-submit {
+            background-color: #2196f3;
+            color: white;
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-submit:hover {
+            background-color: #0b7dda;
+        }
+
+        .btn-cancel {
+            background-color: #ccc;
+            color: #333;
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-cancel:hover {
+            background-color: #bbb;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            table th,
+            table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .actions {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Employee Management System</h1>
+    </div>
+
+    <div class="container">
+        <div id="alertContainer"></div>
+
+        <div class="content">
+            <div class="section-header">
+                <h2>Employee List</h2>
+                <button class="btn-add" onclick="openAddModal()">Add New Employee</button>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="employeeTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Position</th>
+                            <th>Department</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesBody">
+                        <tr>
+                            <td colspan="5" class="empty-state">Loading employees...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Employee Modal -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Employee</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="employeeForm" onsubmit="saveEmployee(event)">
+                <input type="hidden" id="employeeId">
+
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" placeholder="Enter employee name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter email address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="position">Position</label>
+                    <input type="text" id="position" placeholder="Enter position" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" required>
+                        <option value="">Select a department</option>
+                        <option value="IT">IT</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="Design">Design</option>
+                        <option value="Operations">Operations</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-submit">Save Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Employee Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Employee Details</h2>
+                <button class="close-btn" onclick="closeViewModal()">&times;</button>
+            </div>
+            <div id="viewContent"></div>
+            <div class="form-actions" style="margin-top: 2rem;">
+                <button class="btn btn-cancel" onclick="closeViewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Employee Management System</p>
+    </div>
+
+    <script>
+        const API_BASE = '/api/employees';
+
+        // Load employees on page load
+        document.addEventListener('DOMContentLoaded', loadEmployees);
+
+        async function loadEmployees() {
+            try {
+                const response = await fetch(API_BASE);
+                const employees = await response.json();
+                renderEmployees(employees);
+            } catch (error) {
+                console.error('Error loading employees:', error);
+                showAlert('Error loading employees', 'error');
+                renderEmployees([]);
+            }
+        }
+
+        function renderEmployees(employees) {
+            const tbody = document.getElementById('employeesBody');
+
+            if (!employees || employees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No employees found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = employees.map(emp => `
+                <tr>
+                    <td>${escapeHtml(emp.name || emp.surname || 'N/A')}</td>
+                    <td>${escapeHtml(emp.email || 'N/A')}</td>
+                    <td>${escapeHtml(emp.position || 'N/A')}</td>
+                    <td>${escapeHtml(emp.department || 'N/A')}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-view" onclick="viewEmployee(${emp.id})">View</button>
+                            <button class="btn btn-edit" onclick="editEmployee(${emp.id})">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteEmployee(${emp.id})">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Employee';
+            document.getElementById('employeeForm').reset();
+            document.getElementById('employeeId').value = '';
+            document.getElementById('employeeModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('employeeModal').classList.remove('active');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').classList.remove('active');
+        }
+
+        async function viewEmployee(id) {
+            try {
+                const response = await fetch(`${API_BASE}/${id}`);
+                const employee = await response.json();
+
+                const viewContent = document.getElementById('viewContent');
+                viewContent.innerHTML = `
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" value="${escapeHtml(employee.name || employee.surname || 'N/A')}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" value="${escapeHtml(employee.email || 'N/A')}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Position</label>
+                        <input type="text" value="${escapeHtml(employee.position || 'N/A')}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" value="${escapeHtml(employee.department || 'N/A')}" disabled>
+                    </div>
+                `;
+                document.getElementById('viewModal').classList.add('active');
+            } catch (error) {
+                console.error('Error viewing employee:', error);
+                showAlert('Error viewing employee', 'error');
+            }
+        }
+
+        async function editEmployee(id) {
+            try {
+                const response = await fetch(`${API_BASE}/${id}`);
+                const employee = await response.json();
+
+                document.getElementById('modalTitle').textContent = 'Edit Employee';
+                document.getElementById('employeeId').value = employee.id;
+                document.getElementById('name').value = employee.name || '';
+                document.getElementById('email').value = employee.email || '';
+                document.getElementById('position').value = employee.position || '';
+                document.getElementById('department').value = employee.department || '';
+                document.getElementById('employeeModal').classList.add('active');
+            } catch (error) {
+                console.error('Error loading employee:', error);
+                showAlert('Error loading employee', 'error');
+            }
+        }
+
+        async function saveEmployee(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('employeeId').value;
+            const employee = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                position: document.getElementById('position').value,
+                department: document.getElementById('department').value
+            };
+
+            try {
+                const response = await fetch(
+                    id ? `${API_BASE}/${id}` : API_BASE,
+                    {
+                        method: id ? 'PUT' : 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(employee)
+                    }
+                );
+
+                if (response.ok) {
+                    showAlert(
+                        id ? 'Employee updated successfully' : 'Employee added successfully',
+                        'success'
+                    );
+                    closeModal();
+                    loadEmployees();
+                } else {
+                    showAlert('Error saving employee', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving employee:', error);
+                showAlert('Error saving employee', 'error');
+            }
+        }
+
+        async function deleteEmployee(id) {
+            if (!confirm('Are you sure you want to delete this employee?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('Employee deleted successfully', 'success');
+                    loadEmployees();
+                } else {
+                    showAlert('Error deleting employee', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                showAlert('Error deleting employee', 'error');
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = `alert-${Date.now()}`;
+
+            const alertHTML = `
+                <div id="${alertId}" class="alert alert-${type}">
+                    ${escapeHtml(message)}
+                </div>
+            `;
+
+            alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('employeeModal').addEventListener('click', (e) => {
+            if (e.target.id === 'employeeModal') {
+                closeModal();
+            }
+        });
+
+        document.getElementById('viewModal').addEventListener('click', (e) => {
+            if (e.target.id === 'viewModal') {
+                closeViewModal();
+            }
+        });
+    </script>
+</body>
+</html>
