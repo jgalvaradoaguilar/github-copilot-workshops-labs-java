@@ -60,6 +60,8 @@ public class EmployeeController {
         existingEmployee.setName(employee.getName());
         existingEmployee.setSurname(employee.getSurname());
         existingEmployee.setEmail(employee.getEmail());
+        existingEmployee.setPosition(employee.getPosition());
+        existingEmployee.setDepartment(employee.getDepartment());
         Employee updatedEmployee = employeeService.saveEmployee(existingEmployee);
         logger.info("Salida: {}", updatedEmployee);
         return ResponseEntity.ok(updatedEmployee);

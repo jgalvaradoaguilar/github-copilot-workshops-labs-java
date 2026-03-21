@@ -200,6 +200,154 @@ public class EmployeeServiceTest {
     }
 
     @Test
+    public void testDeleteEmployeeNullId() {
+        assertThatThrownBy(() -> employeeService.deleteEmployee(null))
+                .isInstanceOf(InvalidEmployeeException.class)
+                .hasMessageContaining("positive");
+    }
+
+    // Repository exception handling tests
+
+    @Test
+    public void testGetAllEmployeesRepositoryException() {
+        when(employeeRepository.findAll()).thenThrow(new RuntimeException("Database error"));
+
+        assertThatThrownBy(() -> employeeService.getAllEmployees())
+                .isInstanceOf(EmployeeServiceException.class)
+                .hasMessageContaining("Failed to retrieve employees");
+    }
+
+    @Test
+    public void testGetEmployeeByIdRepositoryException() {
+        when(employeeRepository.findById(1L)).thenThrow(new RuntimeException("Database error"));
+
+        assertThatThrownBy(() -> employeeService.getEmployeeById(1L))
+                .isInstanceOf(EmployeeServiceException.class)
+                .hasMessageContaining("Failed to retrieve employee");
+    }
+
+    @Test
+    public void testSaveEmployeeRepositoryException() {
+        when(employeeRepository.save(employee)).thenThrow(new RuntimeException("Database error"));
+
+        assertThatThrownBy(() -> employeeService.saveEmployee(employee))
+                .isInstanceOf(EmployeeServiceException.class)
+                .hasMessageContaining("Failed to save employee");
+    }
+
+    @Test
+    public void testDeleteEmployeeRepositoryException() {
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+        doThrow(new RuntimeException("Database error")).when(employeeRepository).deleteById(1L);
+
+        assertThatThrownBy(() -> employeeService.deleteEmployee(1L))
+                .isInstanceOf(EmployeeServiceException.class)
+                .hasMessageContaining("Failed to delete employee");
+    }
+
+    @Test
+    public void testFindEmployeeByEmailRepositoryException() {
+        when(employeeRepository.findByEmail(employee.getEmail()))
+                .thenThrow(new RuntimeException("Database error"));
+
+        assertThatThrownBy(() -> employeeService.findEmployeeByEmail(employee.getEmail()))
+                .isInstanceOf(EmployeeServiceException.class)
+                .hasMessageContaining("Failed to find employee");
+    }
+
+    // Whitespace and trim tests for email and name validation
+
+    @Test
+    public void testSaveEmployeeWhitespaceOnlyEmail() {
+        employee.setEmail("   ");
+        assertThatThrownBy(() -> employeeService.saveEmployee(employee))
+                .isInstanceOf(InvalidEmployeeException.class)
+                .hasMessageContaining("email");
+    }
+
+    @Test
+    public void testSaveEmployeeWhitespaceOnlyName() {
+        employee.setName("   ");
+        assertThatThrownBy(() -> employeeService.saveEmployee(employee))
+                .isInstanceOf(InvalidEmployeeException.class)
+                .hasMessageContaining("name");
+    }
+
+    @Test
+    public void testFindEmployeeByEmailWhitespaceOnly() {
+        assertThatThrownBy(() -> employeeService.findEmployeeByEmail("   "))
+                .isInstanceOf(InvalidEmployeeException.class)
+                .hasMessageContaining("null or empty");
+    }
+
+    // Boundary value tests
+
+    @Test
+    public void testGetEmployeeByIdZero() {
+        assertThatThrownBy(() -> employeeService.getEmployeeById(0L))
+                .isInstanceOf(InvalidEmployeeException.class)
+                .hasMessageContaining("positive");
+    }
+
+    @Test
+    public void testDeleteEmployeeByIdZero() {
+        assertThatThrownBy(() -> employeeService.deleteEmployee(0L))
+                .isInstanceOf(InvalidEmployeeException.class)
+                .hasMessageContaining("positive");
+    }
+
+    @Test
+    public void testGetEmployeeByIdPositiveNumber() {
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+
+        Employee result = employeeService.getEmployeeById(1L);
+        assertThat(result).isEqualTo(employee);
+    }
+
+    @Test
+    public void testGetEmployeeByIdLargeNumber() {
+        Employee largeIdEmployee = new Employee();
+        largeIdEmployee.setId(Long.MAX_VALUE);
+        largeIdEmployee.setName("Test");
+        largeIdEmployee.setEmail("test@example.com");
+
+        when(employeeRepository.findById(Long.MAX_VALUE)).thenReturn(Optional.of(largeIdEmployee));
+
+        Employee result = employeeService.getEmployeeById(Long.MAX_VALUE);
+        assertThat(result.getId()).isEqualTo(Long.MAX_VALUE);
+    }
+
+    // Test for successful save with various scenarios
+
+    @Test
+    public void testSaveEmployeeWithAllFields() {
+        employee.setSurname("TestSurname");
+        when(employeeRepository.save(employee)).thenReturn(employee);
+
+        Employee savedEmployee = employeeService.saveEmployee(employee);
+        assertThat(savedEmployee).isNotNull();
+        assertThat(savedEmployee.getName()).isEqualTo(employee.getName());
+        assertThat(savedEmployee.getEmail()).isEqualTo(employee.getEmail());
+        assertThat(savedEmployee.getSurname()).isEqualTo(employee.getSurname());
+    }
+
+    // Verify repository interactions
+
+    @Test
+    public void testGetAllEmployeesInvokeRepository() {
+        when(employeeRepository.findAll()).thenReturn(Arrays.asList());
+        employeeService.getAllEmployees();
+        verify(employeeRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testFindEmployeeByEmailInvokeRepository() {
+        when(employeeRepository.findByEmail(employee.getEmail())).thenReturn(Optional.of(employee));
+        employeeService.findEmployeeByEmail(employee.getEmail());
+        verify(employeeRepository, times(1)).findByEmail(employee.getEmail());
+    }
+
+    @Test
     public void testGetRepositoryInteractions() {
         when(employeeRepository.findAll()).thenReturn(Arrays.asList(employee));
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
