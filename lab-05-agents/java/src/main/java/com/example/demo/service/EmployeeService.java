@@ -79,18 +79,16 @@ public class EmployeeService {
         }
     }
 
-    public Employee findEmployeeByEmail(String email) {
-        if (email == null || email.trim().isEmpty()) {
-            throw new InvalidEmployeeException("Email cannot be null or empty");
+    public List<Employee> searchEmployees(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return getAllEmployees();
         }
         try {
-            return employeeRepository.findByEmail(email)
-                    .orElseThrow(() -> new EmployeeNotFoundException("Employee with email '" + email + "' not found"));
-        } catch (EmployeeNotFoundException e) {
-            throw e;
+            logger.info("Searching employees with term: {}", searchTerm);
+            return employeeRepository.searchByNameOrEmail(searchTerm);
         } catch (Exception e) {
-            logger.error("Error finding employee by email: {}", email, e);
-            throw new EmployeeServiceException("Failed to find employee by email", e);
+            logger.error("Error searching employees with term: {}", searchTerm, e);
+            throw new EmployeeServiceException("Failed to search employees", e);
         }
     }
 }

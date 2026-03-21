@@ -45,6 +45,14 @@ public class EmployeeController {
         return ResponseEntity.ok(employee);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Employee>> searchEmployees(@RequestParam String q) {
+        logger.info("Entrada: GET /api/employees/search?q={}", q);
+        List<Employee> employees = employeeService.searchEmployees(q);
+        logger.info("Salida: Found {} employees matching search", employees.size());
+        return ResponseEntity.ok(employees);
+    }
+
     @PostMapping
     public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
         logger.info("Entrada: POST /api/employees");
