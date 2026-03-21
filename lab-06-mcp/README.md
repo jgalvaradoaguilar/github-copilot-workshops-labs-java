@@ -340,6 +340,12 @@ mvn clean package
 mvn exec:java -Dexec.mainClass="com.example.mcp.MCPServer"
 ```
 
+**NEW - Client & Server in same project:**
+
+```bash
+mvn exec:java -Pserver
+```
+
 Or run the JAR directly:
 
 ```bash
@@ -471,6 +477,12 @@ public class MCPClient {
 mvn exec:java -Dexec.mainClass="com.example.mcp.MCPClient"
 ```
 
+**NEW - Client & Server in same project:**
+
+```bash
+mvn exec:java -Pclient
+```
+
 ---
 
 ## 7. Testing Your Implementation
@@ -479,6 +491,12 @@ Run your client to verify everything works:
 
 ```bash
 mvn exec:java -Dexec.mainClass="com.example.mcp.MCPClient"
+```
+
+**NEW - Client & Server in same project:**
+
+```bash
+mvn exec:java -Pclient
 ```
 
 Expected output should show:

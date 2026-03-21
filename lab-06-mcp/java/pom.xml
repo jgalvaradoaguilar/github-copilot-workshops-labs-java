@@ -69,14 +69,11 @@
                 </configuration>
             </plugin>
 
-            <!-- Exec plugin for running -->
+            <!-- Exec plugin for running - uses profiles for different main classes -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
-                <configuration>
-                    <mainClass>com.example.mcp.MCPServer</mainClass>
-                </configuration>
             </plugin>
 
             <!-- JAR plugin with dependencies -->
@@ -102,4 +99,40 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Profile for running the Server -->
+        <profile>
+            <id>server</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <mainClass>com.example.mcp.MCPServer</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Profile for running the Client -->
+        <profile>
+            <id>client</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <mainClass>com.example.mcp.MCPClient</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
