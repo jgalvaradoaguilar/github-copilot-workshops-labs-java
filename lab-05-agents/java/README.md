@@ -316,7 +316,7 @@ copilot -p "Show me this week's commits and summarize them" --allow-tool 'shell(
 
 5. **Use GitHub Copilot CLI** to generate code or fix issues. For instance, you can ask to enhance the Employee Management UI created in Challenge 5, for example:
    ```sh
-   copilot "add search filters"
+   copilot -p "add search filters"
    ```
    
 6. **Try asking for suggestions**. For instance, you can ask:
